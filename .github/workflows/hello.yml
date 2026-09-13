@@ -1,20 +1,37 @@
-name: Hello GitHub Actions
+name: Deploy Website
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
-  hello:
+  deploy:
+
     runs-on: ubuntu-latest
 
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
-      - name: Say Hello
-        run: echo "Hello from GitHub Actions!"
 
-      - name: Show current directory
-        run: pwd
+      - name: Checkout code
+        uses: actions/checkout@v6
 
-      - name: List files
-        run: ls -la
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: '.'
+
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@v4
